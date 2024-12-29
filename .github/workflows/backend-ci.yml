@@ -2,13 +2,13 @@ name: Backend CI
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ deploy ]
     paths:
       - '**/*.rb'
       - 'Gemfile'
       - 'Gemfile.lock'
   pull_request:
-    branches: [ develop ]
+    branches: [ deploy ]
 
 jobs:
   test:
