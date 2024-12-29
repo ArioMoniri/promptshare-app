@@ -2,7 +2,7 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ develop ]
     paths:
       - '**/*.ts'
       - '**/*.tsx'
@@ -11,7 +11,7 @@ on:
       - 'package.json'
       - 'yarn.lock'
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]
 
 jobs:
   test:
