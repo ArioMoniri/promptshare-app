@@ -1,0 +1,9 @@
+test:
+  adapter: postgresql
+  host: localhost
+  encoding: unicode
+  database: promptshare_test
+  pool: 5
+  username: postgres
+  password: postgres
+
