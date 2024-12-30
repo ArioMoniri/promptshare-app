@@ -4,6 +4,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { ThumbsUp, ThumbsDown, Star, GitFork, MessageSquare, AlertTriangle, Share2 } from 'lucide-react'
+import { PromptActions } from "@/components/prompt-actions"
+import { useState } from "react"
 
 type PromptCardProps = {
   prompt: {
@@ -29,6 +31,13 @@ type PromptCardProps = {
 }
 
 export function PromptCard({ prompt }: PromptCardProps) {
+  const [likes, setLikes] = useState(prompt.likes)
+  const [dislikes, setDislikes] = useState(prompt.dislikes || 0)
+
+  const handleActionComplete = () => {
+    // Refresh the prompt data here if needed
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -59,44 +68,20 @@ export function PromptCard({ prompt }: PromptCardProps) {
         )}
       </CardContent>
       <CardFooter className="flex justify-between">
+        <PromptActions
+          promptId={prompt.id.toString()}
+          initialLikes={likes}
+          initialDislikes={dislikes}
+          initialStars={prompt.stars || 0}
+          initialComments={prompt.comments}
+          onActionComplete={handleActionComplete}
+        />
         <div className="flex space-x-2">
-          <Button variant="ghost" size="sm">
-            <ThumbsUp className="mr-2 h-4 w-4" />
-            {prompt.likes}
-          </Button>
-          {prompt.dislikes !== undefined && (
-            <Button variant="ghost" size="sm">
-              <ThumbsDown className="mr-2 h-4 w-4" />
-              {prompt.dislikes}
-            </Button>
-          )}
-          <Button variant="ghost" size="sm">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            {prompt.comments}
-          </Button>
-        </div>
-        <div className="flex space-x-2">
-          {prompt.stars !== undefined && (
-            <Button variant="ghost" size="sm">
-              <Star className="mr-2 h-4 w-4" />
-              {prompt.stars}
-            </Button>
-          )}
-          {prompt.forks !== undefined && (
-            <Button variant="ghost" size="sm">
-              <GitFork className="mr-2 h-4 w-4" />
-              {prompt.forks}
-            </Button>
-          )}
-          {prompt.issues !== undefined && (
-            <Button variant="ghost" size="sm">
-              <AlertTriangle className="mr-2 h-4 w-4" />
-              {prompt.issues}
-            </Button>
-          )}
-          <Button variant="ghost" size="sm">
-            <Share2 className="mr-2 h-4 w-4" />
-            Share
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={`/prompts/${prompt.id}`}>
+              <Share2 className="mr-2 h-4 w-4" />
+              Share
+            </Link>
           </Button>
         </div>
       </CardFooter>
