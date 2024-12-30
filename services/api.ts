@@ -239,3 +239,23 @@ export const searchPrompts = async (query: string, category: string) => {
   }
 };
 
+export const starPrompt = async (id: string) => {
+  try {
+    const response = await api.post(`/prompts/${id}/star`);
+    return response.data;
+  } catch (error) {
+    console.error('Star Prompt error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to star prompt. Please try again.');
+  }
+};
+
+export const unstarPrompt = async (id: string) => {
+  try {
+    const response = await api.delete(`/prompts/${id}/star`);
+    return response.data;
+  } catch (error) {
+    console.error('Unstar Prompt error:', error);
+    throw new Error(error.response?.data?.message || 'Failed to unstar prompt. Please try again.');
+  }
+};
+
