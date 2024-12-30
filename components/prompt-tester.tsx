@@ -2,63 +2,95 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { testPrompt } from "@/services/api"
 
-type PromptTesterProps = {
-  initialPrompt: string
+interface PromptTesterProps {
+  promptId: string
+  promptContent: string
 }
 
-export function PromptTester({ initialPrompt }: PromptTesterProps) {
-  const [prompt, setPrompt] = useState(initialPrompt)
-  const [response, setResponse] = useState("")
+export function PromptTester({ promptId, promptContent }: PromptTesterProps) {
+  const [apiKey, setApiKey] = useState("")
+  const [result, setResult] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const { toast } = useToast()
 
   const handleTest = async () => {
-    setIsLoading(true)
-    // TODO: Replace with actual API call to test prompt
-    try {
-      const res = await fetch("/api/test-prompt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt }),
+    if (!apiKey) {
+      toast({
+        title: "API Key Required",
+        description: "Please enter your OpenAI API key",
+        variant: "destructive",
       })
-      const data = await res.json()
-      setResponse(data.response)
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await testPrompt(promptId, promptContent, apiKey)
+      setResult(response.result)
     } catch (error) {
-      console.error("Error testing prompt:", error)
-      setResponse("An error occurred while testing the prompt.")
+      console.error('Error testing prompt:', error)
+      toast({
+        title: "Error",
+        description: "Failed to test prompt. Please try again.",
+        variant: "destructive",
+      })
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Test Prompt</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Edit the prompt here if needed"
-          rows={4}
-          className="mb-4"
-        />
-        <Button onClick={handleTest} disabled={isLoading}>
-          {isLoading ? "Testing..." : "Test Prompt"}
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          Test Prompt
         </Button>
-      </CardContent>
-      {response && (
-        <CardFooter>
-          <div className="w-full">
-            <h3 className="font-semibold mb-2">Response:</h3>
-            <p className="whitespace-pre-wrap">{response}</p>
-          </div>
-        </CardFooter>
-      )}
-    </Card>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Test Prompt</DialogTitle>
+          <DialogDescription>
+            Enter your OpenAI API key to test this prompt.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <Input
+            placeholder="Enter your OpenAI API key"
+            type="password"
+            value={apiKey}
+            onChange={(e) => setApiKey(e.target.value)}
+          />
+          <Textarea
+            placeholder="Prompt content"
+            value={promptContent}
+            readOnly
+          />
+          <Button onClick={handleTest} disabled={isLoading}>
+            {isLoading ? "Testing..." : "Test"}
+          </Button>
+          {result && (
+            <Textarea
+              placeholder="Result will appear here"
+              value={result}
+              readOnly
+            />
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }
 
